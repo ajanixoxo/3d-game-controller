@@ -1,0 +1,20 @@
+# dependencies / build output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# local tooling state
+.claude/
+
+# misc
+.DS_Store
+*.log
+.env*
+
+# original downloaded model/texture assets — the app ships public/controller.glb
+models/
+
+# separate reference repository with its own git history
+3d-game-controler/

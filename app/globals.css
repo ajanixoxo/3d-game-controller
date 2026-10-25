@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/* Dark, cinematic, single-theme by design: a product-launch stage. */
+@theme {
+  --color-accent: #4f86ff;
+  --color-ink: #f2f5fa;
+  /* ≥ rgba(255,255,255,0.7) equivalent so subtext stays readable over the glow. */
+  --color-muted: #b4bac6;
+  --font-sans: var(--font-exo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-orbitron), var(--font-exo), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  color-scheme: dark;
+  --bg-base: #080808;
+  --bg-glow: 115, 128, 140; /* neutral cool gray, used as rgb() channels */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Dark spotlight stage, pure CSS: near-black base, one neutral-gray glow
+   behind the controller, a faint floor pool, darkened edges. The transparent
+   WebGL canvas sits over it. */
+body {
+  min-height: 100vh;
+  background-color: var(--bg-base);
+  background-image:
+    /* 1. edge vignette (top layer) */
+    radial-gradient(ellipse 85% 80% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.6) 100%),
+    /* 2. main spotlight behind the controller */
+    radial-gradient(
+      ellipse 40% 52% at 50% 45%,
+      rgba(var(--bg-glow), 0.45) 0%,
+      rgba(var(--bg-glow), 0.2) 45%,
+      rgba(var(--bg-glow), 0.05) 75%,
+      transparent 100%
+    ),
+    /* 3. faint floor light pool */
+    radial-gradient(ellipse 34% 7% at 50% 88%, rgba(var(--bg-glow), 0.22) 0%, transparent 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+  color: var(--color-ink);
+  overflow-x: clip;
+}
+
+/* Futuristic display face for headlines only; body copy stays readable. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+/* Very subtle film grain under the content: dithers the gradients so the
+   dark spotlight never bands. Inline SVG noise — no network request. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Hide the DOM story during ?shot= debug captures. */
+[data-shot] main,
+[data-shot] header {
+  visibility: hidden;
+}
+
+/* Open editorial copy column — no card chrome; a faint shadow keeps white
+   type legible when the bright shell sweeps behind it during transitions. */
+.copy-block {
+  text-shadow: 0 1px 18px rgba(5, 7, 12, 0.85), 0 0 36px rgba(5, 7, 12, 0.6);
+}
+.eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* Phones only: the model and copy share the viewport, so fade the stage
+   toward the page background behind the lower third. */
+.stage-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 48vh;
+  background: linear-gradient(to top, var(--bg-base) 12%, rgba(8, 8, 8, 0));
+  pointer-events: none;
+}
+@media (min-width: 640px) {
+  .stage-fade {
+    display: none;
+  }
+}
+
+/* Hotspot markers rendered by drei <Html> inside the 3D scene. */
+.hotspot-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(9, 13, 21, 0.55);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.hotspot-dot span {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #fff;
+  transition: background 0.2s;
+}
+.hotspot-dot:hover,
+.hotspot-dot.is-active {
+  border-color: var(--color-accent);
+  transform: scale(1.18);
+}
+.hotspot-dot.is-active span {
+  background: var(--color-accent);
+}
+.hotspot-dot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Feature-demo controls. */
+.demo-btn {
+  border-radius: 9999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.6rem 1.15rem;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.demo-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, #fff 0%);
+  opacity: 0.9;
+}
+.demo-btn:active {
+  transform: scale(0.97);
+}
+.demo-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.demo-note {
+  margin-top: 0.8rem;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
