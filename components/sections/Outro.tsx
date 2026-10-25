@@ -33,8 +33,17 @@ export function Outro() {
           An independent, non-commercial 3D web experiment. Not affiliated with
           or endorsed by Sony Interactive Entertainment. &ldquo;PlayStation&rdquo;,
           &ldquo;PS5&rdquo; and &ldquo;DualSense&rdquo; are trademarks of Sony
-          Interactive Entertainment Inc. 3D model adapted from a community-made
-          asset for this demonstration.
+          Interactive Entertainment Inc. 3D model: &ldquo;DualSense PS5&rdquo; by{" "}
+          <a
+            href="https://www.cgtrader.com/free-3d-models/interior/house-interior/dualsense-ps5-d29a3bcb-22a6-4e51-b3c6-4bece07950b2"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-white/30 underline-offset-2 hover:text-ink"
+          >
+            lucasbds via CGTrader
+          </a>
+          , adapted and used under CGTrader&apos;s Editorial License (no AI) —
+          editorial, non-commercial use only.
         </p>
       </footer>
     </section>
