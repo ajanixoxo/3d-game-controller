@@ -7,14 +7,16 @@ next-env.d.ts
 
 # local tooling state
 .claude/
+.serena/
 
 # misc
 .DS_Store
 *.log
 .env*
 
-# original downloaded model/texture assets — the app ships public/controller.glb
-models/
+# original downloaded model/texture assets (root folder only —
+# the app's runtime copy lives in public/models/ and IS committed)
+/models/
 
 # separate reference repository with its own git history
 3d-game-controler/
