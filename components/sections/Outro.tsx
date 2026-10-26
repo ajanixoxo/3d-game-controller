@@ -7,7 +7,8 @@ export function Outro() {
 
   return (
     <section data-s-outro className="relative flex min-h-[120vh] flex-col justify-end">
-      <div className="relative flex min-h-screen flex-col items-center justify-center text-center [text-shadow:0_2px_30px_rgba(5,7,12,0.9),0_0_60px_rgba(5,7,12,0.7)]">
+      <div className="stage-fade" aria-hidden />
+      <div className="relative flex min-h-screen flex-col items-center justify-end pb-[10vh] text-center [text-shadow:0_2px_30px_rgba(5,7,12,0.9),0_0_60px_rgba(5,7,12,0.7)] sm:justify-center sm:pb-0">
         <div
           aria-hidden
           className="absolute left-1/2 top-1/2 -z-10 h-[28rem] w-[34rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(5,7,12,0.55),transparent)]"

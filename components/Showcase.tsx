@@ -138,6 +138,14 @@ export default function Showcase() {
       store.reduced = prefersReduced;
       setReduced(prefersReduced);
 
+      // Phones: copy and model share the column, so a section's content fades
+      // away before it can travel across the model (desktop's side-by-side
+      // layout never collides and keeps everything visible).
+      const isMobile = window.matchMedia("(max-width: 639px)").matches;
+      const fadeCopy = (sel: string, out: boolean) => {
+        if (isMobile) gsap.to(`${sel} > div`, { autoAlpha: out ? 0 : 1, duration: 0.3, overwrite: "auto" });
+      };
+
       if (prefersReduced) {
         // Static, non-choreographed experience: default framing, rotation
         // always available, hotspots always on, explode via button.
@@ -193,6 +201,8 @@ export default function Showcase() {
             end: "+=2400",
             scrub: 1,
             pin: true,
+            onLeave: () => fadeCopy("[data-s-inside]", true),
+            onEnterBack: () => fadeCopy("[data-s-inside]", false),
             onUpdate: (self) => {
               setInsidePhase(self.progress < 0.38 ? 0 : self.progress < 0.72 ? 1 : 2);
               const step = Math.round(store.explode * 10);
@@ -216,6 +226,8 @@ export default function Showcase() {
         end: "+=3000",
         pin: true,
         snap: { snapTo: 1 / (FEATURES.length - 1), duration: 0.4, ease: "power1.inOut" },
+        onLeave: () => fadeCopy("[data-s-features]", true),
+        onEnterBack: () => fadeCopy("[data-s-features]", false),
         onUpdate: (self) => {
           const i = Math.max(0, Math.min(FEATURES.length - 1, Math.round(self.progress * (FEATURES.length - 1))));
           if (store.feature !== i) {
@@ -260,6 +272,20 @@ export default function Showcase() {
         })
         .to(store.cam, { px: 0, py: 4.6, pz: 15.5, tx: 0, ty: -0.2, tz: 0, fov: 30, ease: "none" }, 0)
         .to(store, { baseYaw: 0.45, ease: "none" }, 0);
+
+      // The unpinned sections scroll away normally, so their fade scrubs with
+      // the section's own bottom edge. (The pinned sections fade via their
+      // pin triggers' onLeave above — offset start/end math is unreliable
+      // across pin spacers.)
+      if (isMobile) {
+        for (const trigger of ["[data-s-hero]", "[data-s-explore]", "[data-s-connect]"]) {
+          gsap.to(`${trigger} > div`, {
+            autoAlpha: 0,
+            ease: "none",
+            scrollTrigger: { trigger, start: "bottom 92%", end: "bottom 65%", scrub: true },
+          });
+        }
+      }
     },
     { scope: root },
   );

@@ -96,8 +96,20 @@ body::before {
 .stage-fade {
   position: absolute;
   inset: auto 0 0 0;
-  height: 58vh;
-  background: linear-gradient(to top, var(--bg-base) 28%, rgba(8, 8, 8, 0));
+  /* Below the section's static copy, above the fixed canvas (main's z-10
+     stacking context keeps negative z children in front of the model). */
+  z-index: -1;
+  height: 66vh;
+  /* Transparent at BOTH ends — a hard bottom edge would read as a line
+     slicing the model while the section scrolls away. The copy rides inside
+     the solid middle band, so text always carries its own veil. */
+  background: linear-gradient(
+    to top,
+    rgba(8, 8, 8, 0) 0%,
+    var(--bg-base) 16%,
+    var(--bg-base) 58%,
+    rgba(8, 8, 8, 0) 100%
+  );
   pointer-events: none;
 }
 @media (min-width: 640px) {

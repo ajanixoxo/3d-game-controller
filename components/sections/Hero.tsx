@@ -6,6 +6,7 @@ export function Hero() {
   return (
     <section data-s-hero className="relative h-[160vh]">
       <div className="sticky top-0 flex h-screen flex-col items-center justify-end px-6 pb-[12vh] text-center">
+        <div className="stage-fade" aria-hidden />
         <p data-hero-line className="mb-4 font-mono text-xs uppercase tracking-[0.35em] text-accent">
           DualSense wireless controller
         </p>
