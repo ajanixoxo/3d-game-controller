@@ -96,8 +96,8 @@ body::before {
 .stage-fade {
   position: absolute;
   inset: auto 0 0 0;
-  height: 48vh;
-  background: linear-gradient(to top, var(--bg-base) 12%, rgba(8, 8, 8, 0));
+  height: 58vh;
+  background: linear-gradient(to top, var(--bg-base) 28%, rgba(8, 8, 8, 0));
   pointer-events: none;
 }
 @media (min-width: 640px) {
