@@ -12,17 +12,32 @@ import { DEFAULT_CAM, store, type CamState } from "@/lib/store";
     lower so the model rides the upper half above the copy. */
 const REF_ASPECT = 1.6;
 
-function frameForAspect(c: CamState, aspect: number, lift: number): { fov: number; tx: number; ty: number } {
+/** Phone copy block is a roughly constant ~420px tall at the viewport bottom,
+    so clearing it is a screen-space problem: a short visible viewport (mobile
+    browser bars shown) leaves far less room above the copy than the full one
+    the beats were tuned on (844px). Shrink the model in step with that free
+    band and aim it into the band's middle. */
+const COPY_PX = 420;
+const REF_H = 844;
+function frameForAspect(c: CamState, size: { width: number; height: number }, liftK: number): { fov: number; tx: number; ty: number } {
+  const aspect = size.width / size.height;
   if (aspect >= REF_ASPECT) return { fov: c.fov, tx: c.tx, ty: c.ty };
   const narrow = (REF_ASPECT - aspect) / REF_ASPECT;
-  // Keep the desktop horizontal framing, then back off ~15% more so the model
-  // clears the bottom-anchored copy.
-  const t = Math.tan(THREE.MathUtils.degToRad(c.fov / 2)) * (REF_ASPECT / aspect) * (1 + 0.18 * narrow);
-  return {
-    fov: 2 * THREE.MathUtils.radToDeg(Math.atan(t)),
-    tx: c.tx * (1 - narrow),
-    ty: c.ty - narrow * lift,
-  };
+  const phone = size.width < 640; // below sm the copy is bottom-anchored (matches the CSS)
+  const free = Math.max(size.height - COPY_PX, size.height * 0.25);
+  const fit = phone ? Math.max(1, (size.height / free) / (REF_H / (REF_H - COPY_PX))) : 1;
+  // Keep the desktop horizontal framing, back off ~15% more so the model
+  // clears the bottom-anchored copy, then shrink by how much shorter the
+  // free band is than at the reference height.
+  const t = Math.tan(THREE.MathUtils.degToRad(c.fov / 2)) * (REF_ASPECT / aspect) * (1 + 0.18 * narrow) * fit;
+  const fov = 2 * THREE.MathUtils.radToDeg(Math.atan(t));
+  let lift = narrow * 2.0; // tablet portrait: a gentle aim-down is enough
+  if (phone) {
+    const dist = Math.hypot(c.px - c.tx, c.py - c.ty, c.pz - c.tz);
+    const worldH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(fov / 2));
+    lift = liftK * (COPY_PX / 2 / size.height) * worldH;
+  }
+  return { fov, tx: c.tx * (1 - narrow), ty: c.ty - lift };
 }
 
 export function CameraRig() {
@@ -32,9 +47,11 @@ export function CameraRig() {
     const dt = Math.min(rawDt, 0.05);
     const cam = state.camera as THREE.PerspectiveCamera;
     const c = store.cam;
-    // Feature chapters are close-ups framed low — they need more lift than the
-    // full-body shots to clear the copy on phones.
-    const f = frameForAspect(c, cam.aspect, store.feature >= 0 ? 3.2 : 2.0);
+    // The look-target shift lands the model higher on screen than the pure
+    // at-target-distance math predicts (the body sits nearer the camera than
+    // the aim point), so damp the converted lift; the feature close-ups are
+    // framed low by design and need more. Both tuned against screenshots.
+    const f = frameForAspect(c, state.size, store.feature >= 0 ? 1.15 : 0.7);
     if (store.snap) {
       cam.position.set(c.px, c.py, c.pz);
       target.current.set(f.tx, f.ty, c.tz);
