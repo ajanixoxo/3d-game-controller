@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
+import { PerformanceMonitor } from "@react-three/drei";
 import { CameraRig } from "./CameraRig";
 import { Controller } from "./Controller";
 import { Stage } from "./Stage";
@@ -15,9 +16,15 @@ interface CanvasLayerProps {
 }
 
 export default function CanvasLayer(props: CanvasLayerProps) {
+  // Start at a modest pixel ratio and let the measured frame rate decide:
+  // smooth devices climb to their native dpr (capped at 2), struggling ones
+  // drop to 1x, and a device that keeps oscillating loses the bloom pass too.
+  const [dpr, setDpr] = useState(() => Math.min(1.5, typeof window === "undefined" ? 1.5 : window.devicePixelRatio));
+  const [degraded, setDegraded] = useState(false);
+
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={dpr}
       camera={{ fov: 34, near: 0.1, far: 120, position: [0, 3.4, 12.5] }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ touchAction: "pan-y" }}
@@ -26,11 +33,21 @@ export default function CanvasLayer(props: CanvasLayerProps) {
         gl.toneMappingExposure = 1.0;
       }}
     >
-      <Suspense fallback={null}>
-        <Stage />
-        <Controller {...props} />
-      </Suspense>
-      <CameraRig />
+      <PerformanceMonitor
+        onIncline={() => setDpr(Math.min(2, window.devicePixelRatio))}
+        onDecline={() => setDpr(1)}
+        flipflops={3}
+        onFallback={() => {
+          setDpr(1);
+          setDegraded(true);
+        }}
+      >
+        <Suspense fallback={null}>
+          <Stage />
+          <Controller {...props} effects={!degraded} />
+        </Suspense>
+        <CameraRig />
+      </PerformanceMonitor>
     </Canvas>
   );
 }

@@ -154,9 +154,11 @@ interface ControllerProps {
   activeHotspot: string | null;
   onHotspot: (id: string) => void;
   onReady: () => void;
+  /** False on devices that can't hold a frame rate — skips the bloom pass. */
+  effects: boolean;
 }
 
-export function Controller({ hotspotsVisible, activeHotspot, onHotspot, onReady }: ControllerProps) {
+export function Controller({ hotspotsVisible, activeHotspot, onHotspot, onReady, effects }: ControllerProps) {
   const { scene } = useGLTF(MODEL_URL);
   const { camera } = useThree();
   const prepared = useMemo(() => prepare(scene), [scene]);
@@ -394,8 +396,8 @@ export function Controller({ hotspotsVisible, activeHotspot, onHotspot, onReady 
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {/* Bloom restricted to the light bar strip — the product-shot glow. */}
-      {prepared.lightbarMeshes.length > 0 && (
-        <EffectComposer multisampling={4}>
+      {effects && prepared.lightbarMeshes.length > 0 && (
+        <EffectComposer multisampling={2}>
           <SelectiveBloom
             selection={prepared.lightbarMeshes}
             mipmapBlur
