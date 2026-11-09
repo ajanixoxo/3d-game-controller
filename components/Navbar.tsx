@@ -17,10 +17,10 @@ const LINKS = [
    opt-in via the button, which also satisfies the browsers' user-gesture
    autoplay rule — nothing plays until enabled. */
 export function Navbar() {
-  const [sound, setSound] = useState(true);
+  const [sound, setSound] = useState(false);
 
-  // Sound is on by default, but the AudioContext can only start from a real
-  // user gesture — unlock it on the first one.
+  // Sound is off by default; pre-unlock the AudioContext on the first real
+  // user gesture so enabling it later plays without delay.
   useEffect(() => {
     const unlock = () => unlockAudio();
     window.addEventListener("pointerdown", unlock, { once: true });

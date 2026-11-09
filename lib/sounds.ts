@@ -8,7 +8,7 @@ let ctx: AudioContext | null = null;
 // real user gesture, so unlockAudio() is called from a one-time listener.
 // Until then play calls are silently dropped (never queued — a queue would
 // burst out all at once on unlock).
-let enabled = true;
+let enabled = false; // muted by default; the navbar toggle opts in
 
 function ready(): AudioContext | null {
   if (!enabled || typeof window === "undefined") return null;
