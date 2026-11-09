@@ -390,10 +390,13 @@ export function Controller({ hotspotsVisible, activeHotspot, onHotspot, onReady,
             ) : null,
           )}
       </group>
-      {/* Invisible backdrop so drag-to-rotate also starts off the model. */}
+      {/* Invisible backdrop so drag-to-rotate also starts off the model.
+          visible=false on the MATERIAL: the renderer skips it (an opacity-0
+          fullscreen quad still costs fill rate every frame on mobile GPUs)
+          while raycasting, which tests geometry, keeps hitting it. */}
       <mesh position={[0, 0, -6]} onPointerDown={startRotate}>
         <planeGeometry args={[80, 50]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <meshBasicMaterial visible={false} />
       </mesh>
       {/* Bloom restricted to the light bar strip — the product-shot glow. */}
       {effects && prepared.lightbarMeshes.length > 0 && (
